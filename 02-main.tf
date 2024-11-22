@@ -73,8 +73,8 @@ resource "aws_default_security_group" "default-sg" {
     }
 
     ingress {
-        from_port = 80
-        to_port = 80
+        from_port = 8080
+        to_port = 8080
         protocol = "TCP"
         cidr_blocks = ["0.0.0.0/0"]
     }    
@@ -132,13 +132,7 @@ resource "aws_instance" "myapp-server" {
     associate_public_ip_address = true
     key_name = aws_key_pair.ssh-key.key_name
 
-    user_data = <<EOF
-    #!/bin/bash
-    sudo yum update -y && sudo yum install docker -y
-    sudo systemctl start docker
-    sudo usermod -aG docker ec2-user
-    docker run -p 8080:80 nginx
-    EOF
+    user_data = file("entry-script.sh")
 
     user_data_replace_on_change = true       
 
